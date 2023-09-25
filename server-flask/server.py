@@ -4,16 +4,18 @@ from flask_cors import CORS
 from werkzeug.security import ( generate_password_hash, check_password_hash )
 import re
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 CORS(app, origins=['https://batida-de-ponto-api-flask.vercel.app', 'http://localhost:5173'], supports_credentials=True)
 
 # Configuração do banco de dados
+# Configuração do banco de dados
 conexao = mysql.connector.connect(
-    host='localhost',
-    user='root',
-    password='joojerablack',
-    database='db_ponto',
+    host=os.getenv('DB_HOST'),
+    user=os.getenv('DB_USER'),
+    password=os.getenv('DB_PASSWORD'),
+    database=os.getenv('DB_NAME'),
 )
 
 
