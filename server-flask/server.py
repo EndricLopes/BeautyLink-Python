@@ -17,6 +17,10 @@ conexao = mysql.connector.connect(
 )
 
 
+@app.route('/')
+def home():
+    return "Hello, World!"
+
 
 @app.route('/Cadastro', methods=['GET'])
 def get_usuarios():
