@@ -6,7 +6,7 @@ import re
 from datetime import datetime
 
 app = Flask(__name__)
-CORS(app, origins=['http://127.0.0.1:5000', 'http://localhost:5173'], supports_credentials=True)
+CORS(app, origins=['https://batida-de-ponto-api-flask.vercel.app', 'http://localhost:5173'], supports_credentials=True)
 
 # Configuração do banco de dados
 conexao = mysql.connector.connect(
