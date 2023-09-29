@@ -1,5 +1,4 @@
 {
-    "version": 3.11,
     "builds": [
         {
             "src": "api/server-flask/server.py",
