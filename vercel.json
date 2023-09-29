@@ -1,15 +1,15 @@
 {
-    "version": 2,
+    "version": 3.11,
     "builds": [
         {
-            "src": "server-flask/server.py",
+            "src": "api/server-flask/server.py",
             "use": "@vercel/python"
         }
     ],
     "routes": [
         {
             "src": "./(.*)",
-            "dest": "server-flask/server.py"
+            "dest": "api/server-flask/server.py"
         }
     ]
 }
