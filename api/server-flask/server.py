@@ -7,7 +7,7 @@ from datetime import datetime
 import os
 
 app = Flask(__name__)
-CORS(app, origins=['https://pagina-batida-ponto.vercel.app/','https://batida-de-ponto-api-flask.vercel.app' ], supports_credentials=True)
+CORS(app, origins=['https://pagina-batida-ponto.vercel.app/','https://batida-de-ponto-api-flask.vercel.app' ], supports_credentials=True, methods="*", allow_headers="*")
 
 # Configuração do banco de dados
 # Configuração do banco de dados
