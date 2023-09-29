@@ -8,6 +8,6 @@
     ],
     "rewrites": [
         {"source": "/(.*)", 
-        "destination": "/"}
+        "destination": "api/server-flask/server.py"}
     ]
 }

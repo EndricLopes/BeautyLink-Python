@@ -19,7 +19,7 @@ conexao = mysql.connector.connect(
 )
 
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def home():
     return "Hello, World!"
 
