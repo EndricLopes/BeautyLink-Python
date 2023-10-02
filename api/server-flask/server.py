@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import mysql.connector
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from werkzeug.security import ( generate_password_hash, check_password_hash )
 import re
 from datetime import datetime
@@ -20,11 +20,13 @@ conexao = mysql.connector.connect(
 
 
 @app.route('/', methods=['GET'])
+@cross_origin()
 def home():
     return "Hello, World!"
 
 
 @app.route('/Cadastro', methods=['GET'])
+@cross_origin()
 def get_usuarios():
     cursor = conexao.cursor(dictionary=True)
     cursor.execute('SELECT * FROM cadastro')
@@ -35,6 +37,7 @@ def get_usuarios():
 
 
 @app.route('/Usuarios', methods=['GET'])
+@cross_origin()
 def get_usuario(id):
     cursor = conexao.cursor(dictionary=True)
     cursor.execute('SELECT * FROM cadastro WHERE id = %s', (id,))
@@ -48,6 +51,7 @@ def get_usuario(id):
 
 
 @app.route('/cadastro', methods=['POST'])
+@cross_origin()
 def cadastro():
     if request.method == 'POST':
         userDetails = request.get_json()
@@ -96,6 +100,7 @@ def cadastro():
 
 
 @app.route('/Login', methods=['POST'])
+@cross_origin()
 def login():
     dados = request.get_json()
     usuario = dados['usuario']
@@ -119,6 +124,7 @@ def login():
 from datetime import datetime, timedelta
 
 @app.route('/Ponto', methods=['POST'])
+@cross_origin()
 def bater_ponto():
     dados = request.get_json()
     usuario = dados['usuario']
