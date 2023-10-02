@@ -124,7 +124,7 @@ def login():
 from datetime import datetime, timedelta
 
 @app.route('/Ponto', methods=['POST'])
-@cross_origin()
+@cross_origin(supports_credentials=True)
 def bater_ponto():
     dados = request.get_json()
     usuario = dados['usuario']
