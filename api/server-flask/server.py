@@ -122,6 +122,7 @@ def login():
 
 
 from datetime import datetime, timedelta, time
+import pytz
 
 @app.route('/Ponto', methods=['POST'])
 @cross_origin(supports_credentials=True)
@@ -130,7 +131,8 @@ def bater_ponto():
     usuario = dados['usuario']
 
     # Obter a hora atual
-    agora = datetime.now()
+    fuso = pytz.timezone('America/Sao_Paulo')
+    agora = datetime.now(fuso)
     hora_str = agora.strftime('%H:%M')
 
     hora = time(int(hora_str.split(':')[0]), int(hora_str.split(':')[1]))
