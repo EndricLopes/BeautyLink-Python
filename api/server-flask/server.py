@@ -121,7 +121,7 @@ def login():
 
 
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 
 @app.route('/Ponto', methods=['POST'])
 @cross_origin(supports_credentials=True)
@@ -131,7 +131,9 @@ def bater_ponto():
 
     # Obter a hora atual
     agora = datetime.now()
-    hora = agora.strftime('%H:%M')
+    hora_str = agora.strftime('%H:%M')
+
+    hora = time(int(hora_str.split(':')[0]), int(hora_str.split(':')[1]))
 
     cursor = conexao.cursor(dictionary=True)
     cursor.execute('SELECT * FROM controle_login WHERE l_usuario = %s', (usuario,))
