@@ -128,13 +128,16 @@ from datetime import datetime, timedelta
 def bater_ponto():
     dados = request.get_json()
     usuario = dados['usuario']
-    hora = datetime.strptime(dados['hora'], '%H:%M').time()  # converta a string de hora para um objeto time
+
+    # Obter a hora atual
+    agora = datetime.now()
+    hora = agora.strftime('%H:%M')
 
     cursor = conexao.cursor(dictionary=True)
     cursor.execute('SELECT * FROM controle_login WHERE l_usuario = %s', (usuario,))
     usuario_existente = cursor.fetchone()
     # Viu se o usuario existe
-    
+
     if usuario_existente:
         cursor.execute('SELECT * FROM controle_ponto WHERE fk_id_login_ponto = %s AND dia = CURDATE() ORDER BY id_cntrl_ponto DESC LIMIT 1', (usuario_existente['id_login'],))
         ponto_existente_hoje = cursor.fetchone()
@@ -144,7 +147,7 @@ def bater_ponto():
 
         if ponto_existente_hoje:
             ultima_hora_inserida = max([(datetime.min + v).time() if isinstance(v, timedelta) else datetime.strptime(v, '%H:%M').time() for k, v in ponto_existente_hoje.items() if 'hora' in k and v is not None])
-                # Define uma lista, com os valores de id_cntrl_ponto de hj, somente considera a coluna que começa com hora e não é nulo.
+            # Define uma lista, com os valores de id_cntrl_ponto de hj, somente considera a coluna que começa com hora e não é nulo.
 
             if ultima_hora_inserida is not None and hora <= ultima_hora_inserida:
                 resp = jsonify({'message': 'A nova batida de ponto deve ser maior do que a última hora inserida'})
