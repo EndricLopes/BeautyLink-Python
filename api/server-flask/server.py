@@ -165,8 +165,9 @@ def bater_ponto():
                 comando = 'UPDATE controle_ponto SET hora_saida2 = %s WHERE id_cntrl_ponto = %s'
                 valores = (hora, ponto_existente_hoje['id_cntrl_ponto'])
             else:
-                resp = jsonify({'message': 'Todos os pontos de hoje já foram usados'})
-                return resp, 400
+                # Se todos os campos de hora estiverem preenchidos, crie uma nova linha
+                comando = 'INSERT INTO controle_ponto (usuario, fk_id_login_ponto, hora_entrada1, dia) VALUES (%s, %s, %s, CURDATE())'
+                valores = (usuario_existente['l_usuario'], usuario_existente['id_login'], hora)
             
         else:
             comando = 'INSERT INTO controle_ponto (usuario, fk_id_login_ponto, hora_entrada1, dia) VALUES (%s, %s, %s, CURDATE())'
