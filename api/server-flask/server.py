@@ -3,8 +3,9 @@ import mysql.connector
 from flask_cors import CORS, cross_origin
 from werkzeug.security import ( generate_password_hash, check_password_hash )
 import re
-from datetime import datetime
+from datetime import datetime,timedelta, time
 import os
+import pytz
 
 app = Flask(__name__)
 CORS(app, origins=['https://pontomidas.vercel.app/' ], supports_credentials=True)
@@ -120,9 +121,6 @@ def login():
     
 
 
-
-from datetime import datetime, timedelta, time
-import pytz
 
 @app.route('/Ponto', methods=['POST'])
 @cross_origin(supports_credentials=True)
