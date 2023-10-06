@@ -146,31 +146,36 @@ def bater_ponto():
 
         ultima_hora_inserida = None
 
+
         if ponto_existente_hoje:
             ultima_hora_inserida = max([(datetime.min + v).time() for k, v in ponto_existente_hoje.items() if 'hora' in k and v is not None])
-             # Define uma lista, com os valores de id_cntrl_ponto de hj, somente considera a coluna que começa com hora e não é nulo, pega o maior valor da lista.
+             # Define uma lista com os valores de id_cntrl_ponto de hj, só considera as colunas que começam com hora e não são nulo, pega o maior valor da lista.
+
 
             if ultima_hora_inserida is not None and hora <= ultima_hora_inserida:
                 resp = jsonify({'message': 'A nova batida de ponto deve ser maior do que a última hora inserida'})
                 return resp, 400
+                # Não deixa bater ponto contrário a entropia temporal.
 
-            if not ponto_existente_hoje['hora_saida1']:
-                comando = 'UPDATE controle_ponto SET hora_saida1 = %s WHERE id_cntrl_ponto = %s'
-                valores = (hora, ponto_existente_hoje['id_cntrl_ponto'])
-            elif not ponto_existente_hoje['hora_entrada2']:
-                comando = 'UPDATE controle_ponto SET hora_entrada2 = %s WHERE id_cntrl_ponto = %s'
-                valores = (hora, ponto_existente_hoje['id_cntrl_ponto'])
-            elif not ponto_existente_hoje['hora_saida2']:
-                comando = 'UPDATE controle_ponto SET hora_saida2 = %s WHERE id_cntrl_ponto = %s'
-                valores = (hora, ponto_existente_hoje['id_cntrl_ponto'])
+
+            campos_horas = ['hora_saida1', 'hora_entrada2', 'hora_saida2']
+            for campo in campos_horas:
+                if not ponto_existente_hoje[campo]:
+                    comando = f'UPDATE controle_ponto SET {campo} = %s WHERE id_cntrl_ponto = %s'
+                    valores = (hora, ponto_existente_hoje['id_cntrl_ponto'])
+                    break
+            
             else:
-                # Se todos os campos de hora estiverem preenchidos, crie uma nova linha
                 comando = 'INSERT INTO controle_ponto (usuario, fk_id_login_ponto, hora_entrada1, dia) VALUES (%s, %s, %s, CURDATE())'
                 valores = (usuario_existente['l_usuario'], usuario_existente['id_login'], hora)
-            
+                # Se todas as colunas estão preenchidas, cria uma nova coluna.
+
+
         else:
             comando = 'INSERT INTO controle_ponto (usuario, fk_id_login_ponto, hora_entrada1, dia) VALUES (%s, %s, %s, CURDATE())'
             valores = (usuario_existente['l_usuario'], usuario_existente['id_login'], hora)
+            # Se ainda não houver ponto hoje, adiciona na primeira coluna.
+
 
         cursor.execute(comando, valores)
         
