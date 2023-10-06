@@ -3,7 +3,7 @@ import mysql.connector
 from flask_cors import CORS, cross_origin
 from werkzeug.security import ( generate_password_hash, check_password_hash )
 import re
-from datetime import datetime,timedelta, time
+from datetime import datetime, time
 import os
 import pytz
 
@@ -142,12 +142,12 @@ def bater_ponto():
     if usuario_existente:
         cursor.execute('SELECT * FROM controle_ponto WHERE fk_id_login_ponto = %s AND dia = CURDATE() ORDER BY id_cntrl_ponto DESC LIMIT 1', (usuario_existente['id_login'],))
         ponto_existente_hoje = cursor.fetchone()
-        # Viu se ja tem um ponto registrado hoje atraves de uma lista, que é a coluna do id_cntrl_ponto
+        # Viu se ja tem um ponto registrado hoje com seu id atraves de uma lista, que é a coluna do id_cntrl_ponto
 
         ultima_hora_inserida = None
 
         if ponto_existente_hoje:
-            ultima_hora_inserida = max([(datetime.min + v).time() if isinstance(v, timedelta) else datetime.strptime(v, '%H:%M').time() for k, v in ponto_existente_hoje.items() if 'hora' in k and v is not None])
+            ultima_hora_inserida = max([v for k, v in ponto_existente_hoje.items() if 'hora' in k and v is not None])
             # Define uma lista, com os valores de id_cntrl_ponto de hj, somente considera a coluna que começa com hora e não é nulo.
 
             if ultima_hora_inserida is not None and hora <= ultima_hora_inserida:
