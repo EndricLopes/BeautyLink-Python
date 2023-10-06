@@ -3,7 +3,7 @@ import mysql.connector
 from flask_cors import CORS, cross_origin
 from werkzeug.security import ( generate_password_hash, check_password_hash )
 import re
-from datetime import datetime, time
+from datetime import datetime,timedelta, time
 import os
 import pytz
 
@@ -147,8 +147,8 @@ def bater_ponto():
         ultima_hora_inserida = None
 
         if ponto_existente_hoje:
-            ultima_hora_inserida = max([v for k, v in ponto_existente_hoje.items() if 'hora' in k and v is not None])
-            # Define uma lista, com os valores de id_cntrl_ponto de hj, somente considera a coluna que começa com hora e não é nulo.
+            ultima_hora_inserida = max([(datetime.min + v).time() for k, v in ponto_existente_hoje.items() if 'hora' in k and v is not None])
+             # Define uma lista, com os valores de id_cntrl_ponto de hj, somente considera a coluna que começa com hora e não é nulo, pega o maior valor da lista.
 
             if ultima_hora_inserida is not None and hora <= ultima_hora_inserida:
                 resp = jsonify({'message': 'A nova batida de ponto deve ser maior do que a última hora inserida'})
