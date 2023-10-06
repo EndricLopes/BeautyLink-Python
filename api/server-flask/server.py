@@ -122,9 +122,10 @@ def login():
 
 
 
-@app.route('/Ponto', methods=['POST'])
+@app.route('/Ponto', methods=['GET','POST'])
 @cross_origin(supports_credentials=True)
 def bater_ponto():
+
     dados = request.get_json()
     usuario = dados['usuario']
 
