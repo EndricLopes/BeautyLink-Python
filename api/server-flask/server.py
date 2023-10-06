@@ -131,9 +131,8 @@ def bater_ponto():
     # Obter a hora atual
     fuso = pytz.timezone('America/Sao_Paulo')
     agora = datetime.now(fuso)
-    hora_str = agora.strftime('%H:%M')
-
-    hora = time(int(hora_str.split(':')[0]), int(hora_str.split(':')[1]))
+    
+    hora = time(agora.hour, agora.minute)
 
     cursor = conexao.cursor(dictionary=True)
     cursor.execute('SELECT * FROM controle_login WHERE l_usuario = %s', (usuario,))
