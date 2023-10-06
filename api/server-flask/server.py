@@ -122,10 +122,9 @@ def login():
 
 
 
-@app.route('/Ponto', methods=['GET','POST'])
+@app.route('/Ponto', methods=['POST'])
 @cross_origin(supports_credentials=True)
 def bater_ponto():
-
     dados = request.get_json()
     usuario = dados['usuario']
 
@@ -182,8 +181,7 @@ def bater_ponto():
         
         try:
             conexao.commit()
-            hora_str = hora.strftime('%H:%M')
-            resp = jsonify({'message': 'Ponto batido com sucesso', 'hora': hora_str})
+            resp = jsonify({'message': 'Ponto batido com sucesso'})
             return resp, 201
         except Exception as e:
             print("Falha ao fazer commit: ", e)
@@ -193,8 +191,20 @@ def bater_ponto():
     else:
         resp = jsonify({'message': 'Usuário não encontrado'})
         return resp, 404
+    
 
 
+@app.route('/Hora', methods=['GET'])
+def get_hora():
+    # Obter a hora atual no fuso horário de Brasília
+    fuso = pytz.timezone('America/Sao_Paulo')
+    agora = datetime.now(fuso)
+    
+    # Formatar a hora como uma string no formato HH:MM:SS
+    hora_str = agora.strftime('%H:%M')
+    
+    # Retornar a hora como JSON
+    return jsonify({'hora': hora_str})
 
 
 
