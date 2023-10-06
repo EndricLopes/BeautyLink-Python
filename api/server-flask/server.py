@@ -158,7 +158,7 @@ def bater_ponto():
                 # Não deixa bater ponto contrário a entropia temporal.
 
 
-            campos_horas = ['hora_saida1', 'hora_entrada2', 'hora_saida2']
+            campos_horas = ['hora_saida1', 'hora_entrada2', 'hora_saida2', 'hora_entrada3','hora_saida3']
             for campo in campos_horas:
                 if not ponto_existente_hoje[campo]:
                     comando = f'UPDATE controle_ponto SET {campo} = %s WHERE id_cntrl_ponto = %s'
