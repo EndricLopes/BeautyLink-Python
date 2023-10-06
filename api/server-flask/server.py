@@ -195,6 +195,7 @@ def bater_ponto():
 
 
 @app.route('/Hora', methods=['GET'])
+@cross_origin()
 def get_hora():
     # Obter a hora atual no fuso horário de Brasília
     fuso = pytz.timezone('America/Sao_Paulo')
