@@ -181,7 +181,8 @@ def bater_ponto():
         
         try:
             conexao.commit()
-            resp = jsonify({'message': 'Ponto batido com sucesso'})
+            hora_str = hora.strftime('%H:%M')
+            resp = jsonify({'message': 'Ponto batido com sucesso', 'hora': hora_str})
             return resp, 201
         except Exception as e:
             print("Falha ao fazer commit: ", e)
