@@ -114,7 +114,6 @@ def login():
     # Verifica se esse usuario existe
 
     if usuario_existente and check_password_hash(usuario_existente['senha'], senha):
-        # Aqui você poderia gerar e retornar um token de acesso
         return jsonify({'message': 'Login bem-sucedido'})
     else:
         return jsonify({'message': 'Nome de usuário ou senha inválidos'}), 401
@@ -209,12 +208,18 @@ def get_hora():
 
 
 
+
+@app.route('Espelho', methods=['GET'])
+def get_horas_trabalhadas():
+    cursor = conexao.cursor(dictionary=True)
+    cursor.execute("SELECT (SUM(TIMESTAMPDIFF(MINUTE, hora_entrada1, hora_saida1) + TIMESTAMPDIFF(MINUTE, hora_entrada2, hora_saida2)) / 60.0) AS 'Horas Trabalhadas no Mês' FROM controle_ponto WHERE usuario = 'endric' AND dia BETWEEN '2023-09-10' AND '2023-10-09';")
+    result = cursor.fetchone()
+    return jsonify({'Horas Trabalhadas no Mês': result[0]})
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
 
 
 
