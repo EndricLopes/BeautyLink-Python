@@ -213,9 +213,9 @@ def get_hora():
 @cross_origin()
 def get_horas_trabalhadas():
     cursor = conexao.cursor(dictionary=True)
-    cursor.execute("SELECT (SUM(TIMESTAMPDIFF(MINUTE, hora_entrada1, hora_saida1) + TIMESTAMPDIFF(MINUTE, hora_entrada2, hora_saida2)) / 60.0) AS 'Horas Trabalhadas no Mês' FROM controle_ponto WHERE usuario = 'endric' AND dia BETWEEN '2023-09-10' AND '2023-10-09';")
-    horas_mes = cursor.fetchone()
-    return jsonify({'Horas Trabalhadas no Mês': horas_mes[0]})
+    cursor.execute("SELECT SEC_TO_TIME(SUM(IF(hora_saida1 < hora_entrada1, TIME_TO_SEC(TIMEDIFF(hora_saida1 + INTERVAL 24 HOUR, hora_entrada1)), TIME_TO_SEC(TIMEDIFF(hora_saida1, hora_entrada1))) +IF(hora_saida2 < hora_entrada2, TIME_TO_SEC(TIMEDIFF(hora_saida2 + INTERVAL 24 HOUR, hora_entrada2)), TIME_TO_SEC(TIMEDIFF(hora_saida2, hora_entrada2)))) - 120*60*60) AS 'Saldo Mensal'FROM  controle_pontoWHERE     fk_id_login_ponto = 26 AND    dia BETWEEN '2023-08-10' AND '2023-09-10';")    
+    saldo = cursor.fetchone()    
+    return jsonify({'Saldo': saldo})
 
 
 @app.route('/sua-rota')
