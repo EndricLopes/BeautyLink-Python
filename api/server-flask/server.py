@@ -218,6 +218,44 @@ def get_horas_trabalhadas():
     return jsonify({'Horas Trabalhadas no Mês': horas_mes[0]})
 
 
+@app.route('/sua-rota')
+@cross_origin()
+def get_dados():
+    cursor = conexao.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT 
+            dia,
+            hora_entrada1,
+            hora_saida1,
+            hora_entrada2,
+            hora_saida2,
+            hora_entrada3,
+            hora_saida3,
+            SEC_TO_TIME(
+                IF(hora_saida1 < hora_entrada1, TIME_TO_SEC(TIMEDIFF(hora_saida1 + INTERVAL 24 HOUR, hora_entrada1)), TIME_TO_SEC(TIMEDIFF(hora_saida1, hora_entrada1))) +
+                IF(hora_saida2 < hora_entrada2, TIME_TO_SEC(TIMEDIFF(hora_saida2 + INTERVAL 24 HOUR, hora_entrada2)), TIME_TO_SEC(TIMEDIFF(hora_saida2, hora_entrada2))) +
+                IF(hora_saida3 < hora_entrada3, TIME_TO_SEC(TIMEDIFF(hora_saida3 + INTERVAL 24 HOUR, hora_entrada3)), TIME_TO_SEC(TIMEDIFF(hora_saida3, hora_entrada3))) -
+                8*60*60
+            ) AS 'Saldo',
+            SEC_TO_TIME(
+                IF(hora_saida3 < hora_entrada3, TIME_TO_SEC(TIMEDIFF(hora_saida3 + INTERVAL 24 HOUR, hora_entrada3)), TIME_TO_SEC(TIMEDIFF(hora_saida3, hora_entrada3)))
+            ) AS 'Horas extra'
+        FROM 
+            controle_ponto
+        WHERE 
+            fk_id_login_ponto = 26 AND
+            dia BETWEEN '2023-08-10' AND '2023-09-10';
+    """)
+
+    result = cursor.fetchall()
+    col_names = [desc[0] for desc in cursor.description]
+    data = [
+        dict(zip(col_names, row))
+        for row in result
+    ]
+
+    return jsonify(data)
 
 if __name__ == '__main__':
     app.run(debug=True)
