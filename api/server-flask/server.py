@@ -214,10 +214,10 @@ def get_hora():
 def get_horas_trabalhadas():
     cursor = conexao.cursor(dictionary=True)
     cursor.execute("SELECT SEC_TO_TIME(SUM(IF(hora_saida1 < hora_entrada1, TIME_TO_SEC(TIMEDIFF(hora_saida1 + INTERVAL 24 HOUR, hora_entrada1)), TIME_TO_SEC(TIMEDIFF(hora_saida1, hora_entrada1))) +IF(hora_saida2 < hora_entrada2, TIME_TO_SEC(TIMEDIFF(hora_saida2 + INTERVAL 24 HOUR, hora_entrada2)), TIME_TO_SEC(TIMEDIFF(hora_saida2, hora_entrada2)))) - 120*60*60) AS 'Saldo Mensal'FROM  controle_ponto WHERE     fk_id_login_ponto = 26 AND    dia BETWEEN '2023-08-10' AND '2023-09-10';")    
-    saldo = cursor.fetchall()
+    saldo = cursor.fetchall()[0]['Saldo Mensal']
 
     cursor.execute("SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(hora_saida3, hora_entrada3)))) AS 'Horas Extras no Mês' FROM controle_ponto WHERE fk_id_login_ponto = 27 AND dia BETWEEN '2023-09-01' AND '2023-10-07';")
-    Horas_extra = cursor.fetchall()
+    Horas_extra = cursor.fetchall()[0]['Horas Extras no Mês']
 
     cursor.execute("SELECT hora_entrada1, hora_saida2, dia FROM controle_ponto WHERE fk_id_login_ponto = 26 AND dia BETWEEN '2023-09-10' AND '2023-10-10';")    
     results = cursor.fetchall()
@@ -227,7 +227,7 @@ def get_horas_trabalhadas():
         Hora_entrada = result['hora_entrada1']
         Hora_saida = result['hora_saida2']
         Dia = result['dia']
-        response.append({**{'Saldo Mensal': str(saldo)}, **{'Horario entrada': str(Hora_entrada)}, **{'Horario saida': str(Hora_saida)}, **{'Data': str(Dia)}, **{'Horas extra': str(Horas_extra)}})
+        response.append({**{'Saldo Mensal': str(saldo.total_seconds())}, **{'Horario entrada': str(Hora_entrada)}, **{'Horario saida': str(Hora_saida)}, **{'Data': str(Dia)}, **{'Horas extra': str(Horas_extra)}})
 
     return jsonify(response)
 
