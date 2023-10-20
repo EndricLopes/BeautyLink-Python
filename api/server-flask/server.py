@@ -227,7 +227,7 @@ def get_horas_trabalhadas():
         Hora_entrada = result['hora_entrada1']
         Hora_saida = result['hora_saida2']
         Dia = result['dia']
-        response.append({'Saldo Mensal': str(saldo)}, {'Horario entrada': str(Hora_entrada)},{'Horario saida': str(Hora_saida)}, {'Data': str(Dia)}, {'Horas extra': str(Horas_extra)})
+        response.append({**{'Saldo Mensal': str(saldo)}, **{'Horario entrada': str(Hora_entrada)}, **{'Horario saida': str(Hora_saida)}, **{'Data': str(Dia)}, **{'Horas extra': str(Horas_extra)}})
 
     return jsonify(response)
 
