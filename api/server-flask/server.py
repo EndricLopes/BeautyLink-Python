@@ -228,7 +228,12 @@ def get_horas_trabalhadas():
         cursor.execute(f"SELECT SEC_TO_TIME(SUM(IF(hora_saida1 < hora_entrada1, TIME_TO_SEC(TIMEDIFF(hora_saida1 + INTERVAL 24 HOUR, hora_entrada1)), TIME_TO_SEC(TIMEDIFF(hora_saida1, hora_entrada1))) +IF(hora_saida2 < hora_entrada2, TIME_TO_SEC(TIMEDIFF(hora_saida2 + INTERVAL 24 HOUR, hora_entrada2)), TIME_TO_SEC(TIMEDIFF(hora_saida2, hora_entrada2)))) - 6*60*60) AS 'Saldo Diário'FROM  controle_ponto WHERE fk_id_login_ponto = 26 AND dia = '{Dia}';")    
         saldo = cursor.fetchall()[0]['Saldo Diário']
 
-        response.append({**{'Saldo Diário': str(saldo.total_seconds())}, **{'Horario entrada': str(Hora_entrada)}, **{'Horario saida': str(Hora_saida)}, **{'Data': str(Dia)}, **{'Horas extra': str(Horas_extra)}})
+        if saldo is not None:
+            saldo_str = str(saldo.total_seconds())
+        else:
+            saldo_str = 'N/A'
+
+        response.append({**{'Saldo Diário': saldo_str}, **{'Horario entrada': str(Hora_entrada)}, **{'Horario saida': str(Hora_saida)}, **{'Data': str(Dia)}, **{'Horas extra': str(Horas_extra)}})
 
     return jsonify(response)
 
