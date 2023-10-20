@@ -219,8 +219,8 @@ def get_horas_trabalhadas():
     Horas_extra = cursor.fetchone()
     cursor.execute("SELECT hora_entrada1, hora_saida2, dia FROM controle_ponto WHERE fk_id_login_ponto = 26 AND dia BETWEEN '2023-09-10' AND '2023-10-10';")    
     result = cursor.fetchone()
-    Hora_entrada = result['Hora_entrada1']
-    Hora_saida = result['Hora_saida2']
+    Hora_entrada = result['hora_entrada1']
+    Hora_saida = result['hora_saida2']
     Dia = result['dia']
     return jsonify({'Saldo Mensal': saldo}, {'Horario entrada': Hora_entrada},{'Horario saida': Hora_saida}, {'Data': Dia}, {'Horas extra': Horas_extra})
 
