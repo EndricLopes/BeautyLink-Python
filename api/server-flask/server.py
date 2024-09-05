@@ -209,14 +209,19 @@ def get_hora():
 
 
 
+from flask import request
+
 @app.route('/Espelho', methods=['GET'])
 @cross_origin()
 def get_horas_trabalhadas():
+    inicio = request.args.get('inicio')
+    fim = request.args.get('fim')
+
     cursor = conexao.cursor(dictionary=True)
-    cursor.execute("SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(hora_saida3, hora_entrada3)))) AS 'Horas Extras no Mês' FROM controle_ponto WHERE fk_id_login_ponto = 27 AND dia BETWEEN '2023-09-01' AND '2023-10-07';")
+    cursor.execute(f"SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(hora_saida3, hora_entrada3)))) AS 'Horas Extras no Mês' FROM controle_ponto WHERE fk_id_login_ponto = 27 AND dia BETWEEN '{inicio}' AND '{fim}';")
     Horas_extra = cursor.fetchall()[0]['Horas Extras no Mês']
 
-    cursor.execute("SELECT hora_entrada1, hora_saida2, dia FROM controle_ponto WHERE fk_id_login_ponto = 26 AND dia BETWEEN '2023-09-10' AND '2023-10-10';")    
+    cursor.execute(f"SELECT hora_entrada1, hora_saida2, dia FROM controle_ponto WHERE fk_id_login_ponto = 26 AND dia BETWEEN '{inicio}' AND '{fim}';")    
     results = cursor.fetchall()
 
     response = []
@@ -236,6 +241,7 @@ def get_horas_trabalhadas():
         response.append({**{'Saldo Diário': saldo_str}, **{'Horario entrada': str(Hora_entrada)}, **{'Horario saida': str(Hora_saida)}, **{'Data': str(Dia)}, **{'Horas extra': str(Horas_extra)}})
 
     return jsonify(response)
+
 
 
 @app.route('/sua-rota')
