@@ -113,7 +113,9 @@ def login():
     cursor.close()
     # Verifica se esse usuario existe
 
-    if usuario_existente and check_password_hash(usuario_existente['senha'], senha):
+    if usuario_existente:
+        return jsonify({'message': 'usuário existe!!!'})
+    if check_password_hash(usuario_existente['senha'], senha):
         return jsonify({'message': 'Login bem-sucedido'})
     else:
         return jsonify({'message': 'Nome de usuário ou senha inválidos'}), 401
