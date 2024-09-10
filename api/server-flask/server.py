@@ -81,7 +81,7 @@ def cadastro():
             return jsonify({'message' : 'Usuário ou email já existem.'}), 400
 
         add_user = ("INSERT INTO USUARIO "
-                   "(NOME, USUARIO, EMAIL, SENHA) "
+                   "(NOME, LOGIN, EMAIL, SENHA) "
                    "VALUES (%s, %s, %s, %s)")
         data_user = (nome, usuario, email, hashed_senha)
         
