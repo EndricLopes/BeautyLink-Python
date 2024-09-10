@@ -56,10 +56,10 @@ def get_usuario(id):
 def cadastro():
     if request.method == 'POST':
         userDetails = request.get_json()
-        nome = userDetails['nome']
-        usuario = userDetails['usuario']
-        email = userDetails['email']
-        senha = userDetails['senha']
+        nome = userDetails['NOME']
+        usuario = userDetails['LOGIN']
+        email = userDetails['EMAIL']
+        senha = userDetails['SENHA']
 
         hashed_senha = generate_password_hash(senha)
 
@@ -75,13 +75,13 @@ def cadastro():
         cursor = conexao.cursor()
 
         # Verifica se o usuário ou email já existem
-        cursor.execute("SELECT * FROM cadastro WHERE usuario=%s OR email=%s", (usuario, email))
+        cursor.execute("SELECT * FROM USUARIO WHERE LOGIN=%s OR EMAIL=%s", (usuario, email))
         account = cursor.fetchone()
         if account:
             return jsonify({'message' : 'Usuário ou email já existem.'}), 400
 
-        add_user = ("INSERT INTO cadastro "
-                   "(nome, usuario, email, senha) "
+        add_user = ("INSERT INTO USUARIO "
+                   "(NOME, USUARIO, EMAIL, SENHA) "
                    "VALUES (%s, %s, %s, %s)")
         data_user = (nome, usuario, email, hashed_senha)
         
