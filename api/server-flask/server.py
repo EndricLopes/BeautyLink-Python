@@ -56,7 +56,7 @@ def get_usuario(id):
 def cadastro():
     if request.method == 'POST':
         userDetails = request.get_json()
-        nome = userDetails['[nome]']
+        nome = userDetails['nome']
         usuario = userDetails['usuario']
         email = userDetails['email']
         senha = userDetails['senha']
