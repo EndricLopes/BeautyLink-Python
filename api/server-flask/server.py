@@ -30,7 +30,7 @@ def home():
 @cross_origin()
 def get_usuarios():
     cursor = conexao.cursor(dictionary=True)
-    cursor.execute('SELECT * FROM cadastro')
+    cursor.execute('SELECT * FROM USUARIO')
     usuarios = cursor.fetchall()
     cursor.close()
     return jsonify(usuarios)
@@ -41,7 +41,7 @@ def get_usuarios():
 @cross_origin()
 def get_usuario(id):
     cursor = conexao.cursor(dictionary=True)
-    cursor.execute('SELECT * FROM cadastro WHERE id = %s', (id,))
+    cursor.execute('SELECT * FROM USUARIO WHERE id = %s', (id,))
     usuario = cursor.fetchone()
     cursor.close()
     if usuario:
@@ -108,7 +108,7 @@ def login():
     senha = dados['senha']
 
     cursor = conexao.cursor(dictionary=True)
-    cursor.execute('SELECT * FROM cadastro WHERE usuario = %s', (usuario,))
+    cursor.execute('SELECT * FROM USUARIO WHERE usuario = %s', (usuario,))
     usuario_existente = cursor.fetchone()
     cursor.close()
     # Verifica se esse usuario existe
