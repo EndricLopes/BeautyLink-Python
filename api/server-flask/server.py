@@ -56,10 +56,10 @@ def get_usuario(id):
 def cadastro():
     if request.method == 'POST':
         userDetails = request.get_json()
-        nome = userDetails['NOME']
-        usuario = userDetails['LOGIN']
-        email = userDetails['EMAIL']
-        senha = userDetails['SENHA']
+        nome = userDetails['[nome]']
+        usuario = userDetails['usuario']
+        email = userDetails['email']
+        senha = userDetails['senha']
 
         hashed_senha = generate_password_hash(senha)
 
