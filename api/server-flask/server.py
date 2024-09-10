@@ -108,7 +108,7 @@ def login():
     senha = dados['senha']
 
     cursor = conexao.cursor(dictionary=True)
-    cursor.execute('SELECT * FROM USUARIO WHERE usuario = %s', (usuario,))
+    cursor.execute('SELECT * FROM USUARIO WHERE LOGIN = %s', (usuario,))
     usuario_existente = cursor.fetchone()
     cursor.close()
     # Verifica se esse usuario existe
