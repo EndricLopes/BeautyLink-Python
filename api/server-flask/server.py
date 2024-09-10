@@ -111,15 +111,16 @@ def login():
     cursor.execute('SELECT * FROM USUARIO WHERE LOGIN = %s', (usuario,))
     usuario_existente = cursor.fetchone()
     cursor.close()
-    # Verifica se esse usuario existe
 
     if usuario_existente:
-        return jsonify({'message': 'usuário existe!!!'})
-    if check_password_hash(usuario_existente['senha'], senha):
-        return jsonify({'message': 'Login bem-sucedido'})
+        print(usuario)
+        if check_password_hash(usuario_existente['senha'], senha):
+            return jsonify({'message': 'Login bem-sucedido'})
+        else:
+            return jsonify({'message': 'Nome de usuário ou senha inválidos'}), 401
     else:
-        return jsonify({'message': 'Nome de usuário ou senha inválidos'}), 401
-    
+        return jsonify({'message': 'Nome de usuário inválido'}), 401
+
 
 
 
