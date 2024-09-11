@@ -98,7 +98,7 @@ def cadastro():
         
         return jsonify({'message' : 'Cadastro realizado com sucesso!'})
 
-
+#COMENTARIO
 
 @app.route('/Login', methods=['POST'])
 @cross_origin()
