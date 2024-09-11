@@ -119,76 +119,44 @@ def login():
 
 
 
-@app.route('/Ponto', methods=['POST'])
 @cross_origin(supports_credentials=True)
-def bater_ponto():
+def cadastrar_atendimento():
     dados = request.get_json()
-    usuario = dados['usuario']
+    
+    tipo_servico = dados.get('tipo_servico')
+    data_atendimento = dados.get('data_atendimento')
+    data_marcacao = dados.get('data_marcacao')
+    status_agendamento = dados.get('status_agendamento')
+    observacao = dados.get('observacao')
+    fk_id_funcionario = dados.get('fk_id_funcionario')
+    fk_id_usuario_cliente = dados.get('fk_id_usuario_cliente')
+
+    # Verificar se todos os campos necessários foram fornecidos
+    if not all([tipo_servico, data_atendimento, data_marcacao, status_agendamento, fk_id_funcionario, fk_id_usuario_cliente]):
+        return jsonify({'message': 'Todos os campos são obrigatórios'}), 400
 
     # Obter a hora atual
     fuso = pytz.timezone('America/Sao_Paulo')
     agora = datetime.now(fuso)
-    
-    hora = time(agora.hour, agora.minute)
 
     cursor = conexao.cursor(dictionary=True)
-    cursor.execute('SELECT * FROM controle_login WHERE l_usuario = %s', (usuario,))
-    usuario_existente = cursor.fetchone()
-    # Viu se o usuario existe
 
-    if usuario_existente:
-        cursor.execute('SELECT * FROM controle_ponto WHERE fk_id_login_ponto = %s AND dia = CURDATE() ORDER BY id_cntrl_ponto DESC LIMIT 1', (usuario_existente['id_login'],))
-        ponto_existente_hoje = cursor.fetchone()
-        # Viu se ja tem um ponto registrado hoje com seu id atraves de uma lista, que é a coluna do id_cntrl_ponto
-
-        ultima_hora_inserida = None
-
-
-        if ponto_existente_hoje:
-            ultima_hora_inserida = max([(datetime.min + v).time() for k, v in ponto_existente_hoje.items() if 'hora' in k and v is not None])
-             # Define uma lista com os valores de id_cntrl_ponto de hj, só considera as colunas que começam com hora e não são nulo, pega o maior valor da lista.
-
-
-            if ultima_hora_inserida is not None and hora <= ultima_hora_inserida:
-                resp = jsonify({'message': 'A nova batida de ponto deve ser maior do que a última hora inserida'})
-                return resp, 400
-                # Não deixa bater ponto contrário a entropia temporal.
-
-
-            campos_horas = ['hora_saida1', 'hora_entrada2', 'hora_saida2', 'hora_entrada3','hora_saida3']
-            for campo in campos_horas:
-                if not ponto_existente_hoje[campo]:
-                    comando = f'UPDATE controle_ponto SET {campo} = %s WHERE id_cntrl_ponto = %s'
-                    valores = (hora, ponto_existente_hoje['id_cntrl_ponto'])
-                    break
-            
-            else:
-                comando = 'INSERT INTO controle_ponto (usuario, fk_id_login_ponto, hora_entrada1, dia) VALUES (%s, %s, %s, CURDATE())'
-                valores = (usuario_existente['l_usuario'], usuario_existente['id_login'], hora)
-                # Se todas as colunas estão preenchidas, cria uma nova coluna.
-
-
-        else:
-            comando = 'INSERT INTO controle_ponto (usuario, fk_id_login_ponto, hora_entrada1, dia) VALUES (%s, %s, %s, CURDATE())'
-            valores = (usuario_existente['l_usuario'], usuario_existente['id_login'], hora)
-            # Se ainda não houver ponto hoje, adiciona na primeira coluna.
-
+    try:
+        comando = '''
+            INSERT INTO AGENDA (TIPO_SERVICO, DATA_ATENDIMENTO, DATA_MARCACAO, STATUS_AGENDAMENTO, OBSERVACAO, FK_ID_FUNCIONARIO, FK_ID_USUARIO_CLIENTE)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        '''
+        valores = (tipo_servico, data_atendimento, data_marcacao, status_agendamento, observacao, fk_id_funcionario, fk_id_usuario_cliente)
 
         cursor.execute(comando, valores)
-        
-        try:
-            conexao.commit()
-            resp = jsonify({'message': 'Ponto batido com sucesso'})
-            return resp, 201
-        except Exception as e:
-            print("Falha ao fazer commit: ", e)
-            resp = jsonify({'message': 'Falha ao bater ponto'})
-            return resp, 500
+        conexao.commit()
 
-    else:
-        resp = jsonify({'message': 'Usuário não encontrado'})
-        return resp, 404
-    
+        return jsonify({'message': 'Atendimento cadastrado com sucesso'}), 201
+
+    except Exception as e:
+        print("Falha ao cadastrar atendimento: ", e)
+        conexao.rollback()
+        return jsonify({'message': 'Falha ao cadastrar atendimento'}), 500
 
 
 @app.route('/Hora', methods=['GET'])
