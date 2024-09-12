@@ -213,38 +213,6 @@ def get_horas_trabalhadas():
 
     return jsonify(response)
 
-
-
-@app.route('/sua-rota')
-@cross_origin()
-def get_dados():
-    cursor = conexao.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT 
-            dia,
-            hora_entrada1,
-            hora_saida1,
-            hora_entrada2,
-            hora_saida2,
-            hora_entrada3,
-            hora_saida3,
-            SEC_TO_TIME(
-                IF(hora_saida1 < hora_entrada1, TIME_TO_SEC(TIMEDIFF(hora_saida1 + INTERVAL 24 HOUR, hora_entrada1)), TIME_TO_SEC(TIMEDIFF(hora_saida1, hora_entrada1))) +
-                IF(hora_saida2 < hora_entrada2, TIME_TO_SEC(TIMEDIFF(hora_saida2 + INTERVAL 24 HOUR, hora_entrada2)), TIME_TO_SEC(TIMEDIFF(hora_saida2, hora_entrada2))) +
-                IF(hora_saida3 < hora_entrada3, TIME_TO_SEC(TIMEDIFF(hora_saida3 + INTERVAL 24 HOUR, hora_entrada3)), TIME_TO_SEC(TIMEDIFF(hora_saida3, hora_entrada3))) -
-                8*60*60
-            ) AS 'Saldo',
-            SEC_TO_TIME(
-                IF(hora_saida3 < hora_entrada3, TIME_TO_SEC(TIMEDIFF(hora_saida3 + INTERVAL 24 HOUR, hora_entrada3)), TIME_TO_SEC(TIMEDIFF(hora_saida3, hora_entrada3)))
-            ) AS 'Horas extra'
-        FROM 
-            controle_ponto
-        WHERE 
-            fk_id_login_ponto = 26 AND
-            dia BETWEEN '2023-08-10' AND '2023-09-10';
-    """)
-
     result = cursor.fetchall()
     col_names = [desc[0] for desc in cursor.description]
     data = [
@@ -258,31 +226,3 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
-
-#@app.route('/Update/<int:id>', methods=['PUT'])
-#def atualizar_usuario(id):
-#    dados = request.get_json()
-#    nome = dados['nome']
-#    usuario = dados['usuario']
-#
-#    cursor = conexao.cursor()
-#    comando = 'UPDATE cadastro SET nome = %s, usuario = %s WHERE id = %s'
-#    valores = (nome, usuario, id)
-#    cursor.execute(comando, valores)
-#    conexao.commit()
-#    cursor.close()
-#
- #   return jsonify({'message': 'Usuário atualizado com sucesso'})
-
-
-
-#@app.route('/Excluir/<int:id>', methods=['DELETE'])
-#def excluir_usuario(id):
-#    cursor = conexao.cursor()
-#    comando = 'DELETE FROM cadastro WHERE id = %s'
-#    valores = (id,)
-#    cursor.execute(comando, valores)
-#    conexao.commit()
-#    cursor.close()
-#
-#    return jsonify({'message': 'Usuário excluído com sucesso'})
