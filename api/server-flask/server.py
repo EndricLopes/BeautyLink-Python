@@ -159,18 +159,23 @@ def cadastrar_atendimento():
         return jsonify({'message': 'Falha ao cadastrar atendimento'}), 500
 
 
-@app.route('/Hora', methods=['GET'])
-@cross_origin()
-def get_hora():
-    # Obter a hora atual no fuso horário de Brasília
-    fuso = pytz.timezone('America/Sao_Paulo')
-    agora = datetime.now(fuso)
-    
-    # Formatar a hora como uma string no formato HH:MM:SS
-    hora_str = agora.strftime('%H:%M')
-    
-    # Retornar a hora como JSON
-    return jsonify({'hora': hora_str})
+@app.route('/Atendimentos')
+def get_atendimentos():
+    tipo_servico = request.args.get('tipo_servico')  # Obtemos o tipo de serviço da query string
+    cursor = conexao.cursor(dictionary=True)
+    query = '''
+        SELECT DATA_ATENDIMENTO
+        FROM AGENDA
+        WHERE TIPO_SERVICO = %s AND STATUS_AGENDAMENTO = 'MARCADO'
+    '''
+    cursor.execute(query, (tipo_servico,))
+    atendimentos = cursor.fetchall()
+    cursor.close()
+
+    if atendimentos:
+        return jsonify(atendimentos)
+    else:
+        return jsonify([])  # Retorna uma lista vazia se nenhum atendimento for encontrado
 
 
 
