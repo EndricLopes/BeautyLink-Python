@@ -171,7 +171,7 @@ def get_atendimentos():
     query = '''
         SELECT DATA_ATENDIMENTO
         FROM AGENDA
-        WHERE FK_ID_USUARIO = %s AND STATUS_AGENDAMENTO = 'CADASTRADO'
+        WHERE FK_ID_USUARIO_CLIENTE = %s AND STATUS_AGENDAMENTO = 'CADASTRADO'
     '''
     cursor.execute(query, (usuario,))
     atendimentos = cursor.fetchall()
