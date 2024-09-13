@@ -164,7 +164,7 @@ def cadastrar_atendimento():
         return jsonify({'message': 'Falha ao cadastrar atendimento'}), 500
 
 
-@app.route('/Atendimentos')
+@app.route('/Atendimento')
 def get_atendimentos():
     tipo_servico = request.args.get('tipo_servico')  # Obtemos o tipo de serviço da query string
     cursor = conexao.cursor(dictionary=True)
