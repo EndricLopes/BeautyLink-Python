@@ -123,7 +123,8 @@ def login():
 
 
 
-@cross_origin(supports_credentials=True)
+@app.route('/Ponto', methods=['POST'])
+@cross_origin()
 def cadastrar_atendimento():
     dados = request.get_json()
     
