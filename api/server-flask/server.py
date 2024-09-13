@@ -166,14 +166,14 @@ def cadastrar_atendimento():
 
 @app.route('/Atendimento')
 def get_atendimentos():
-    tipo_servico = request.args.get('tipo_servico')  # Obtemos o tipo de serviço da query string
+    usuario = request.args.get('usuario')  # Obtemos o tipo de serviço da query string
     cursor = conexao.cursor(dictionary=True)
     query = '''
         SELECT DATA_ATENDIMENTO
         FROM AGENDA
-        WHERE TIPO_SERVICO = %s AND STATUS_AGENDAMENTO = 'MARCADO'
+        WHERE FK_ID_USUARIO = %s AND STATUS_AGENDAMENTO = 'CADASTRADO'
     '''
-    cursor.execute(query, (tipo_servico,))
+    cursor.execute(query, (usuario,))
     atendimentos = cursor.fetchall()
     cursor.close()
 
