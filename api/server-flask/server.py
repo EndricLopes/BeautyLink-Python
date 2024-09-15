@@ -164,9 +164,10 @@ def cadastrar_atendimento():
         return jsonify({'message': 'Falha ao cadastrar atendimento'}), 500
 
 
-@app.route('/Atendimento')
+@app.route('/Atendimento', methods=['GET'])
+@cross_origin()
 def get_atendimentos():
-    usuario = request.args.get('usuario')  # Obtemos o tipo de serviço da query string
+    usuario = request.args.get('usuario')  # Obtém o usuário a partir da query string
     cursor = conexao.cursor(dictionary=True)
     query = '''
         SELECT DATA_ATENDIMENTO
@@ -181,6 +182,7 @@ def get_atendimentos():
         return jsonify(atendimentos)
     else:
         return jsonify([])  # Retorna uma lista vazia se nenhum atendimento for encontrado
+
 
 
 
