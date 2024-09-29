@@ -180,18 +180,13 @@ def get_atendimentos():
             return jsonify({"message": "Falha ao conectar ao banco de dados"}), 500
 
         with connection.cursor(dictionary=True) as cursor:
-            start_time = time.time()
             query = '''
-                SELECT ID_AGENDA, FK_ID_USUARIO_CLIENTE, DATA_ATENDIMENTO
+                SELECT ID_AGENDA, FK_ID_USUARIO_CLIENTE, DATE_FORMAT(DATA_ATENDIMENTO, '%Y-%m-%dT%H:%i:%sZ') AS DATA_ATENDIMENTO
                 FROM AGENDA
                 WHERE STATUS_AGENDAMENTO = 'CADASTRADO'
             '''
             cursor.execute(query)
             atendimentos = cursor.fetchall()
-            app.logger.info(f"Tempo da consulta get_atendimentos: {time.time() - start_time} segundos")
-            app.logger.debug(f"Atendimentos recuperados: {atendimentos}")
-
-        connection.close()
 
         if atendimentos:
             return jsonify(atendimentos)
@@ -201,6 +196,10 @@ def get_atendimentos():
     except Exception as e:
         app.logger.error(f"Erro ao buscar atendimentos: {e}")
         return jsonify({"message": "Erro ao processar a solicitação", "error": str(e)}), 500
+    finally:
+        if connection.is_connected():
+            connection.close()
+
 
 if __name__ == '__main__':
     app.run(debug=True)
