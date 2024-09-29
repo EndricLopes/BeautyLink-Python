@@ -155,27 +155,33 @@ def cadastrar_atendimento():
 @app.route('/Atendimento', methods=['GET'])
 @cross_origin()
 def get_atendimentos():
-    connection = get_connection()
-    if not connection:
-        return jsonify({"message": "Falha ao conectar ao banco de dados"}), 500
+    try:
+        connection = get_connection()
+        if not connection:
+            return jsonify({"message": "Falha ao conectar ao banco de dados"}), 500
 
-    with connection.cursor(dictionary=True) as cursor:
-        start_time = time.time()
-        query = '''
-            SELECT ID_ATENDIMENTO, FK_ID_USUARIO_CLIENTE, DATA_ATENDIMENTO
-            FROM AGENDA
-            WHERE STATUS_AGENDAMENTO = 'CADASTRADO'
-        '''
-        cursor.execute(query)
-        atendimentos = cursor.fetchall()
-        logging.info(f"Tempo da consulta get_atendimentos: {time.time() - start_time} segundos")
+        with connection.cursor(dictionary=True) as cursor:
+            start_time = time.time()
+            query = '''
+                SELECT ID_ATENDIMENTO, FK_ID_USUARIO_CLIENTE, DATA_ATENDIMENTO
+                FROM AGENDA
+                WHERE STATUS_AGENDAMENTO = 'CADASTRADO'
+            '''
+            cursor.execute(query)
+            atendimentos = cursor.fetchall()
+            logging.info(f"Tempo da consulta get_atendimentos: {time.time() - start_time} segundos")
 
-    connection.close()
+        connection.close()
 
-    if atendimentos:
-        return jsonify(atendimentos)
-    else:
-        return jsonify([])
+        if atendimentos:
+            return jsonify(atendimentos)
+        else:
+            return jsonify([])
+
+    except Exception as e:
+        logging.error(f"Erro ao buscar atendimentos: {str(e)}")
+        return jsonify({"message": "Erro ao processar a solicitação", "error": str(e)}), 500
+
 
 
 
