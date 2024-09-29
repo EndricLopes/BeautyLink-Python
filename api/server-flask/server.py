@@ -175,7 +175,7 @@ def get_atendimentos():
         with connection.cursor(dictionary=True) as cursor:
             start_time = time.time()
             query = '''
-                SELECT ID_ATENDIMENTO, FK_ID_USUARIO_CLIENTE, DATA_ATENDIMENTO
+                SELECT ID_AGENDA, FK_ID_USUARIO_CLIENTE, DATA_ATENDIMENTO
                 FROM AGENDA
                 WHERE STATUS_AGENDAMENTO = 'CADASTRADO'
             '''
@@ -194,6 +194,7 @@ def get_atendimentos():
     except Exception as e:
         app.logger.error(f"Erro ao buscar atendimentos: {e}")
         return jsonify({"message": "Erro ao processar a solicitação", "error": str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
