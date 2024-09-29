@@ -155,23 +155,18 @@ def cadastrar_atendimento():
 @app.route('/Atendimento', methods=['GET'])
 @cross_origin()
 def get_atendimentos():
-    usuario = request.args.get('usuario')
-
-    if not usuario:
-        return jsonify({'message': 'ID do usuário não fornecido'}), 400
-
     connection = get_connection()
     if not connection:
         return jsonify({"message": "Falha ao conectar ao banco de dados"}), 500
 
     with connection.cursor(dictionary=True) as cursor:
-        start_time = time.time()  # Início da medição de tempo
+        start_time = time.time()
         query = '''
-            SELECT DATA_ATENDIMENTO
+            SELECT ID_ATENDIMENTO, FK_ID_USUARIO_CLIENTE, DATA_ATENDIMENTO
             FROM AGENDA
-            WHERE FK_ID_USUARIO_CLIENTE = %s AND STATUS_AGENDAMENTO = 'CADASTRADO'
+            WHERE STATUS_AGENDAMENTO = 'CADASTRADO'
         '''
-        cursor.execute(query, (usuario,))
+        cursor.execute(query)
         atendimentos = cursor.fetchall()
         logging.info(f"Tempo da consulta get_atendimentos: {time.time() - start_time} segundos")
 
@@ -181,6 +176,7 @@ def get_atendimentos():
         return jsonify(atendimentos)
     else:
         return jsonify([])
+
 
 
 if __name__ == '__main__':
