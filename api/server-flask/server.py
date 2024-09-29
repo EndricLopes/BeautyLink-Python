@@ -4,6 +4,7 @@ from flask_cors import CORS, cross_origin
 import logging
 import os
 import time
+from werkzeug.security import check_password_hash  # Adiciona esta linha para verificar hash de senha
 
 app = Flask(__name__)
 CORS(app, origins=['https://beauty-link-react.vercel.app/'], supports_credentials=True)
