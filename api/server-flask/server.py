@@ -4,7 +4,7 @@ from flask_cors import CORS, cross_origin
 import logging
 import os
 import time
-from werkzeug.security import check_password_hash  # Adiciona esta linha para verificar hash de senha
+from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
 CORS(app, origins=['https://beauty-link-react.vercel.app/'], supports_credentials=True)
@@ -12,14 +12,17 @@ CORS(app, origins=['https://beauty-link-react.vercel.app/'], supports_credential
 # Configuração do banco de dados com pool de conexões
 from mysql.connector import pooling
 
+# Configurando o pool de conexões com pool_size reduzido e timeout para conexões ociosas
 dbconfig = {
     "host": os.getenv('DB_HOST'),
     "user": os.getenv('DB_USER'),
     "password": os.getenv('DB_PASSWORD'),
     "database": 'BEAUTY_LINK',
+    "connection_timeout": 10  # Timeout para conexões ociosas
 }
 
-connection_pool = pooling.MySQLConnectionPool(pool_name="mypool", pool_size=10, **dbconfig)
+# Ajuste do pool de conexões para evitar o excesso de conexões simultâneas
+connection_pool = pooling.MySQLConnectionPool(pool_name="mypool", pool_size=5, pool_reset_session=True, **dbconfig)
 
 # Função para obter conexão do pool
 def get_connection():
@@ -48,7 +51,7 @@ def get_usuarios():
 
     try:
         with connection.cursor(dictionary=True) as cursor:
-            start_time = time.time()  # Início da medição de tempo
+            start_time = time.time()
             cursor.execute('SELECT * FROM USUARIO')
             usuarios = cursor.fetchall()
             app.logger.info(f"Tempo de execução de get_usuarios: {time.time() - start_time} segundos")
@@ -56,7 +59,8 @@ def get_usuarios():
         app.logger.error(f"Erro ao buscar usuários: {e}")
         return jsonify({"message": "Erro ao buscar usuários", "error": str(e)}), 500
     finally:
-        connection.close()
+        if connection.is_connected():
+            connection.close()
 
     return jsonify(usuarios)
 
@@ -83,7 +87,8 @@ def get_usuario():
         app.logger.error(f"Erro ao buscar usuário: {e}")
         return jsonify({"message": "Erro ao buscar usuário", "error": str(e)}), 500
     finally:
-        connection.close()
+        if connection.is_connected():
+            connection.close()
 
     if usuario:
         return jsonify(usuario)
@@ -120,7 +125,8 @@ def login():
         app.logger.error(f"Erro no login: {e}")
         return jsonify({"message": "Erro no login", "error": str(e)}), 500
     finally:
-        connection.close()
+        if connection.is_connected():
+            connection.close()
 
 @app.route('/Ponto', methods=['POST'])
 @cross_origin()
@@ -161,7 +167,8 @@ def cadastrar_atendimento():
         connection.rollback()
         return jsonify({'message': 'Falha ao cadastrar atendimento', 'error': str(e)}), 500
     finally:
-        connection.close()
+        if connection.is_connected():
+            connection.close()
 
 @app.route('/Atendimento', methods=['GET'])
 @cross_origin()
@@ -194,7 +201,6 @@ def get_atendimentos():
     except Exception as e:
         app.logger.error(f"Erro ao buscar atendimentos: {e}")
         return jsonify({"message": "Erro ao processar a solicitação", "error": str(e)}), 500
-
 
 if __name__ == '__main__':
     app.run(debug=True)
