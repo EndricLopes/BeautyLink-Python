@@ -41,28 +41,45 @@ def home():
     app.logger.info('Página inicial acessada.')
     return "Hello, World!"
 
-@app.route('/Cadastro', methods=['GET'])
+
+@app.route('/Cadastro', methods=['POST'])
 @cross_origin()
-def get_usuarios():
+def cadastrar_usuario():
+    dados = request.get_json()
+    nome = dados.get('nome')
+    usuario = dados.get('usuario')
+    email = dados.get('email')
+    senha = dados.get('senha')
+
+    if not all([nome, usuario, email, senha]):
+        app.logger.warning("Todos os campos são obrigatórios.")
+        return jsonify({'message': 'Todos os campos são obrigatórios'}), 400
+
     connection = get_connection()
     if not connection:
         app.logger.error("Falha ao conectar ao banco de dados.")
         return jsonify({"message": "Falha ao conectar ao banco de dados"}), 500
 
     try:
-        with connection.cursor(dictionary=True) as cursor:
-            start_time = time.time()
-            cursor.execute('SELECT * FROM USUARIO')
-            usuarios = cursor.fetchall()
-            app.logger.info(f"Tempo de execução de get_usuarios: {time.time() - start_time} segundos")
-    except Exception as e:
-        app.logger.error(f"Erro ao buscar usuários: {e}")
-        return jsonify({"message": "Erro ao buscar usuários", "error": str(e)}), 500
+        with connection.cursor() as cursor:
+            comando = '''
+                INSERT INTO USUARIO (NOME, LOGIN, EMAIL, SENHA)
+                VALUES (%s, %s, %s, %s)
+            '''
+            valores = (nome, usuario, email, senha)  # Supondo que a senha esteja sem hash, é recomendável usar hash
+            cursor.execute(comando, valores)
+            connection.commit()
+
+        app.logger.info("Usuário cadastrado com sucesso.")
+        return jsonify({'message': 'Usuário cadastrado com sucesso'}), 201
+    except mysql.connector.Error as e:
+        app.logger.error(f"Erro ao cadastrar usuário: {e}")
+        connection.rollback()
+        return jsonify({'message': 'Falha ao cadastrar usuário', 'error': str(e)}), 500
     finally:
         if connection.is_connected():
             connection.close()
 
-    return jsonify(usuarios)
 
 @app.route('/Usuarios', methods=['GET'])
 @cross_origin()
@@ -143,6 +160,7 @@ def cadastrar_atendimento():
 
     if not all([tipo_servico, data_atendimento, data_marcacao, status_agendamento, fk_id_funcionario, fk_id_usuario_cliente]):
         app.logger.warning("Todos os campos são obrigatórios.")
+        app.logger.info(f"Data de atendimento recebida: {data_atendimento}")
         return jsonify({'message': 'Todos os campos são obrigatórios'}), 400
 
     connection = get_connection()
