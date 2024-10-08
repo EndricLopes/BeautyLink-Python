@@ -188,6 +188,43 @@ def cadastrar_atendimento():
         if connection.is_connected():
             connection.close()
 
+@app.route('/MeusAtendimentos', methods=['GET'])
+@cross_origin()
+def get_meus_atendimentos():
+    usuario_id = request.args.get('id_usuario')  # Obtém o ID do usuário logado a partir dos parâmetros da query
+    if not usuario_id:
+        app.logger.warning("ID de usuário não fornecido.")
+        return jsonify({'message': 'ID de usuário não fornecido'}), 400
+
+    connection = get_connection()
+    if not connection:
+        app.logger.error("Falha ao conectar ao banco de dados.")
+        return jsonify({"message": "Falha ao conectar ao banco de dados"}), 500
+
+    try:
+        with connection.cursor(dictionary=True) as cursor:
+            query = '''
+                SELECT ID_AGENDA, TIPO_SERVICO, DATE_FORMAT(DATA_ATENDIMENTO, '%Y-%m-%d %H:%i') AS DATA_ATENDIMENTO, STATUS_AGENDAMENTO
+                FROM AGENDA
+                WHERE FK_ID_USUARIO_CLIENTE = %s
+                ORDER BY DATA_ATENDIMENTO ASC
+            '''
+            cursor.execute(query, (usuario_id,))
+            atendimentos = cursor.fetchall()
+
+        if atendimentos:
+            return jsonify(atendimentos)
+        else:
+            app.logger.info("Nenhum atendimento encontrado para o usuário.")
+            return jsonify([])
+    except Exception as e:
+        app.logger.error(f"Erro ao buscar atendimentos: {e}")
+        return jsonify({"message": "Erro ao buscar atendimentos", "error": str(e)}), 500
+    finally:
+        if connection.is_connected():
+            connection.close()
+
+
 @app.route('/Atendimento', methods=['GET'])
 @cross_origin()
 def get_atendimentos():
