@@ -42,6 +42,8 @@ def home():
     return "Hello, World!"
 
 
+from werkzeug.security import generate_password_hash
+
 @app.route('/Cadastro', methods=['POST'])
 @cross_origin()
 def cadastrar_usuario():
@@ -62,11 +64,13 @@ def cadastrar_usuario():
 
     try:
         with connection.cursor() as cursor:
+            # Criptografando a senha antes de armazená-la no banco de dados
+            senha_hash = generate_password_hash(senha)
             comando = '''
                 INSERT INTO USUARIO (NOME, LOGIN, EMAIL, SENHA)
                 VALUES (%s, %s, %s, %s)
             '''
-            valores = (nome, usuario, email, senha)  # Supondo que a senha esteja sem hash, é recomendável usar hash
+            valores = (nome, usuario, email, senha_hash)  # Armazenando a senha criptografada
             cursor.execute(comando, valores)
             connection.commit()
 
@@ -79,6 +83,7 @@ def cadastrar_usuario():
     finally:
         if connection.is_connected():
             connection.close()
+
 
 
 @app.route('/Usuarios', methods=['GET'])
@@ -144,6 +149,7 @@ def login():
     finally:
         if connection.is_connected():
             connection.close()
+
 
 @app.route('/Ponto', methods=['POST'])
 @cross_origin()
