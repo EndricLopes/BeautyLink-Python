@@ -203,17 +203,17 @@ def get_meus_atendimentos():
 
     try:
         with connection.cursor(dictionary=True) as cursor:
-            # Atualizando a consulta para incluir o nome do funcionário
+            # Atualizando a consulta para buscar o nome do funcionário da tabela USUARIO
             query = '''
                 SELECT 
                     A.ID_AGENDA, 
                     A.TIPO_SERVICO, 
                     DATE_FORMAT(A.DATA_ATENDIMENTO, '%Y-%m-%d %H:%i') AS DATA_ATENDIMENTO, 
                     A.STATUS_AGENDAMENTO,
-                    F.NOME AS FUNCIONARIO  -- Aqui estou assumindo que a tabela de funcionários tem um campo NOME
+                    U.NOME AS FUNCIONARIO  -- Buscando o nome do funcionário da tabela USUARIO
                 FROM AGENDA A
-                JOIN FUNCIONARIOS F ON A.FK_ID_FUNCIONARIO = F.ID_FUNCIONARIO  -- Supondo que este seja o relacionamento correto
-                WHERE A.FK_ID_USUARIO_CLIENTE = %s
+                JOIN USUARIO U ON A.FK_ID_FUNCIONARIO = U.ID_USUARIO  -- Ligando a FK_ID_FUNCIONARIO com a tabela USUARIO
+                WHERE A.FK_ID_USUARIO_CLIENTE = %s AND U.FUNCIONARIO = 1  -- Verificando se o usuário é funcionário
                 ORDER BY A.DATA_ATENDIMENTO ASC
             '''
             cursor.execute(query, (usuario_id,))
@@ -230,6 +230,7 @@ def get_meus_atendimentos():
     finally:
         if connection.is_connected():
             connection.close()
+
 
 
 
