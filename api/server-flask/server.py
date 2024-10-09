@@ -203,11 +203,18 @@ def get_meus_atendimentos():
 
     try:
         with connection.cursor(dictionary=True) as cursor:
+            # Atualizando a consulta para incluir o nome do funcionário
             query = '''
-                SELECT ID_AGENDA, TIPO_SERVICO, DATE_FORMAT(DATA_ATENDIMENTO, '%Y-%m-%d %H:%i') AS DATA_ATENDIMENTO, STATUS_AGENDAMENTO
-                FROM AGENDA
-                WHERE FK_ID_USUARIO_CLIENTE = %s
-                ORDER BY DATA_ATENDIMENTO ASC
+                SELECT 
+                    A.ID_AGENDA, 
+                    A.TIPO_SERVICO, 
+                    DATE_FORMAT(A.DATA_ATENDIMENTO, '%Y-%m-%d %H:%i') AS DATA_ATENDIMENTO, 
+                    A.STATUS_AGENDAMENTO,
+                    F.NOME AS FUNCIONARIO  -- Aqui estou assumindo que a tabela de funcionários tem um campo NOME
+                FROM AGENDA A
+                JOIN FUNCIONARIOS F ON A.FK_ID_FUNCIONARIO = F.ID_FUNCIONARIO  -- Supondo que este seja o relacionamento correto
+                WHERE A.FK_ID_USUARIO_CLIENTE = %s
+                ORDER BY A.DATA_ATENDIMENTO ASC
             '''
             cursor.execute(query, (usuario_id,))
             atendimentos = cursor.fetchall()
@@ -223,6 +230,7 @@ def get_meus_atendimentos():
     finally:
         if connection.is_connected():
             connection.close()
+
 
 
 @app.route('/Atendimento', methods=['GET'])
