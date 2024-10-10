@@ -150,6 +150,42 @@ def login():
         if connection.is_connected():
             connection.close()
 
+@app.route('/CancelarAtendimento', methods=['PUT'])
+@cross_origin()
+def cancelar_atendimento():
+    dados = request.get_json()
+    id_atendimento = dados.get('id')
+
+    if not id_atendimento:
+        app.logger.warning("ID do atendimento não fornecido.")
+        return jsonify({'message': 'ID do atendimento não fornecido'}), 400
+
+    connection = get_connection()
+    if not connection:
+        app.logger.error("Falha ao conectar ao banco de dados.")
+        return jsonify({"message": "Falha ao conectar ao banco de dados"}), 500
+
+    try:
+        with connection.cursor() as cursor:
+            # Atualizando o status do atendimento para "CANCELADO"
+            comando = '''
+                UPDATE AGENDA
+                SET STATUS = 'CANCELADO'
+                WHERE ID_AGENDA = %s
+            '''
+            cursor.execute(comando, (id_atendimento,))
+            connection.commit()
+
+        app.logger.info("Atendimento cancelado com sucesso.")
+        return jsonify({'message': 'Atendimento cancelado com sucesso'}), 200
+    except mysql.connector.Error as e:
+        app.logger.error(f"Erro ao cancelar atendimento: {e}")
+        return jsonify({'message': 'Erro ao cancelar atendimento', 'error': str(e)}), 500
+    finally:
+        if connection.is_connected():
+            connection.close()
+
+
 
 @app.route('/Ponto', methods=['POST'])
 @cross_origin()
